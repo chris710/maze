@@ -19,6 +19,34 @@ int main(int argc, char **argv) {
 
 
 maze *maze_random(int width, int height) {
+	
+
+}
 
 
+void maze_svg(maze *maze, char *filename) {
+
+
+}
+
+maze *initialize_maze(int width, int height) {
+	int i;
+	maze new_maze;
+	new_maze.height = height;
+	new_maze.width = width;
+	new_maze.grid = (int**)malloc(sizeof(int*)*width);
+
+	if (new_maze.grid == NULL) {	//check if allocation succeeded
+		fprintf(stderr, "cannot allocate grid\n");
+		return NULL;
+	}
+
+	for (i = 0; i < width; ++i) {	//fill in the grid
+		new_maze.grid[i] = (int*)malloc(height*sizeof(int));
+		if (new_maze.grid[i] == NULL) {		//check if allocation succeeded
+			fprintf(stderr, "cannot allocate row\n");
+			return NULL;
+		}
+	}
+	return &new_maze;
 }
