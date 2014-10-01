@@ -10,8 +10,7 @@ void set_svg_color(char *color)
 
 void svg_header(FILE *f, unsigned int width, unsigned int height)
 {
-  fprintf(f, "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n",
-      width, height);
+	fprintf(f, "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"%d\" height=\"%d\">\n", width, height);
 }
 
 void svg_footer(FILE *f) {

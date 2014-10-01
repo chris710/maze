@@ -3,14 +3,14 @@
 
 int main(int argc, char **argv) {
   unsigned int len;
-  /*if (argc < 3) {
+  if (argc < 3) {
     printf("Usage: %s <width> <height>\n", *argv);
     return 1;
-  }*/
+  }
 
   /* You need to define this function in "maze.c" */
-  //maze *m = maze_random(atoi(argv[1]), atoi(argv[2]));
-  maze *m = maze_random(5, 5);
+  maze *m = maze_random(atoi(argv[1]), atoi(argv[2]));
+  //maze *m = maze_random(5, 5);
   srand(time(NULL));
 
   /* And also this one, using the SVG drawing function provided in "svg.h" */
@@ -25,7 +25,7 @@ maze *maze_random(int width, int height) {
 	FILE *picture;
 	//picture = fopen_s(&picture, "picture.svg", "w");
 	picture = fopen("picture.svg", "w");
-	if (picture = NULL) {
+	if (picture == NULL) {
 		fprintf(stderr, "cannot create/open file\n");
 		return NULL;
 	}
@@ -34,10 +34,9 @@ maze *maze_random(int width, int height) {
 	//void set_svg_color(char *color);
 
 	maze *labir = initialize_maze(width,height);		//maze we're working on
-	create_outer_walls(picture, labir, width, height);
-	divide(picture, 0, 0, width, height, 0,choose_orientation(width,height));
+	create_outer_walls(picture, labir);
+	divide(labir, picture, 0, 0, width, height, choose_orientation(width,height));
 
-	//fprintf(picture, "dupadupa");
 
 	svg_footer(picture);
 	fclose(picture);
@@ -50,11 +49,13 @@ void maze_svg(maze *maze, char *filename) {
 }
 
 maze *initialize_maze(int width, int height) {
-	int i = 0, j = 0;
-	maze new_maze;
-	new_maze.height = height;
-	new_maze.width = width;
-	new_maze.grid = (int**)malloc(sizeof(int*)*width);
+	int i = 0, j = 0;		//iterators
+
+	//maze fields initialisation
+	maze new_maze = { height, width, (int**)malloc(sizeof(int*)*width) };
+	/*new_maze->height = height;
+	new_maze->width = width;
+	new_maze->grid = (int**)malloc(sizeof(int*)*width);*/
 
 	if (new_maze.grid == NULL) {	//check if allocation succeeded
 		fprintf(stderr, "cannot allocate grid\n");
@@ -73,10 +74,10 @@ maze *initialize_maze(int width, int height) {
 	return &new_maze;
 }
 
-void create_outer_walls(FILE* f,maze* maz, int width, int height) {
+void create_outer_walls(FILE* f,maze* maz) {
 	//maz->grid[0][]
 	//svg_rect (f, 0, 0, 0, height);
-	svg_rect (f, 0, 0, width, height);
+	svg_rect (f, 0, 0, maz->width, maz->height);
 	//svg_rect (f, width, 0,  width, height);
 	//svg_rect (f, 0, height, width, height);
 	
@@ -91,7 +92,7 @@ enum orientation choose_orientation(int width, int height) {
 		return HORIZONTAL;	//horizontal line
 	}
 	else
-		return rand(2) == 0 ? VERTICAL : HORIZONTAL;
+		return rand()%2 == 0 ? VERTICAL : HORIZONTAL;
 }
 
 void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orientation o) {
@@ -100,12 +101,12 @@ void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orienta
 	int is_horizontal = HORIZONTAL == o;
 
 	/* wall source coords */
-	int sx = x + is_horizontal ? 0 : rand(width - 2);
-	int sy = y + is_horizontal ? rand(height - 2) : 0;
+	int sx = x + is_horizontal ? 0 : rand()%(width - 2);
+	int sy = y + is_horizontal ? rand()%(height - 2) : 0;
 
 	/* door coords */
-	int dx = sx + (is_horizontal ? rand(width) : 0);
-	int dy = sy + (is_horizontal ? 0 : rand(height));
+	int dx = sx + (is_horizontal ? rand()%width : 0);
+	int dy = sy + (is_horizontal ? 0 : rand()%height);
 
 	int length = is_horizontal ? width : height;
 
@@ -123,11 +124,11 @@ void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orienta
 	/* width and height of new rectangle */
 	int w = is_horizontal ? width : (sx - x + 1);
 	int h = is_horizontal ? (sy - y + 1) : height;
-	divide(m->grid, f, x, y, w, h, choose_orientation(w, h));
+	divide(m, f, x, y, w, h, choose_orientation(w, h));
 
 	int x2 = is_horizontal ? x : (sx + 1);
 	int y2 = is_horizontal ? (sy + 1) : y;
 	w = is_horizontal ? width : (x + width - sx - 1);
 	h = is_horizontal ? (y + height - sy - 1) : height;
-	divide(m->grid, f, x2, y2, w, h, choose_orientation(w, h));
+	divide(m, f, x2, y2, w, h, choose_orientation(w, h));
 }
