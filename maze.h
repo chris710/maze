@@ -22,5 +22,5 @@ void create_outer_walls(FILE* f, maze* maz);								//draw a rectangle in svg
 void maze_svg (maze *maze, char *filename);									//draw a maze in svg
 void divide(maze *m, FILE *f, int x, int y, int width, int height, enum orientation o);		//divide rectangle horizontaly or verticaly
 enum orientation choose_orientation(int width, int height);					//choose vertical or horizontal line to draw
-
+void draw(maze *m);															//suprisingly draws a grid in a console
  
