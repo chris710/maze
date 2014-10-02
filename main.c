@@ -7,12 +7,11 @@ int main(int argc, char **argv) {
     printf("Usage: %s <width> <height>\n", *argv);
     return 1;
   }
+  srand(time(NULL));
 
   /* You need to define this function in "maze.c" */
   maze *m = maze_random(atoi(argv[1]), atoi(argv[2]));
   //maze *m = maze_random(5, 5);
-  srand(time(NULL));
-
   /* And also this one, using the SVG drawing function provided in "svg.h" */
   maze_svg(m, "maze.svg");
 
@@ -31,10 +30,11 @@ maze *maze_random(int width, int height) {
 	}
 
 	svg_header (picture, width, height);
-	//void set_svg_color(char *color);
-
+	set_svg_color("gold");
+	
 	maze *labir = initialize_maze(width,height);		//maze we're working on
-	create_outer_walls(picture, labir);
+	svg_rect (picture, 0, 0, labir->width, labir->height);
+	//create_outer_walls(picture, labir);
 	divide(labir, picture, 0, 0, width, height, choose_orientation(width,height));
 
 
@@ -53,9 +53,6 @@ maze *initialize_maze(int width, int height) {
 
 	//maze fields initialisation
 	maze new_maze = { height, width, (int**)malloc(sizeof(int*)*width) };
-	/*new_maze->height = height;
-	new_maze->width = width;
-	new_maze->grid = (int**)malloc(sizeof(int*)*width);*/
 
 	if (new_maze.grid == NULL) {	//check if allocation succeeded
 		fprintf(stderr, "cannot allocate grid\n");
@@ -71,16 +68,17 @@ maze *initialize_maze(int width, int height) {
 		for (j = 0; j < height; ++j)	//fill maze with emptiness
 			new_maze.grid[i][j] = 0;
 	}
+
+	for (i = 0; i < width; ++i) 
+		for (j = 0; j < height; ++j)	
+			new_maze.grid[i][j] = 0;
+
 	return &new_maze;
 }
 
 void create_outer_walls(FILE* f,maze* maz) {
 	//maz->grid[0][]
-	//svg_rect (f, 0, 0, 0, height);
 	svg_rect (f, 0, 0, maz->width, maz->height);
-	//svg_rect (f, width, 0,  width, height);
-	//svg_rect (f, 0, height, width, height);
-	
 }
 
 enum orientation choose_orientation(int width, int height) {
@@ -88,7 +86,7 @@ enum orientation choose_orientation(int width, int height) {
 	if (width > height) {
 		return VERTICAL;	//vertical line
 	}
-	else if (height>width) {
+	else if (height > width) {
 		return HORIZONTAL;	//horizontal line
 	}
 	else
@@ -97,27 +95,27 @@ enum orientation choose_orientation(int width, int height) {
 
 void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orientation o) {
 	int i = 0;
-	if (width < 2 || height < 2) return;
+	if (width < 2 || height < 2) return;	//if the rectangle is too small, return
 	int is_horizontal = HORIZONTAL == o;
 
 	/* wall source coords */
-	int sx = x + is_horizontal ? 0 : rand()%(width - 2);
-	int sy = y + is_horizontal ? rand()%(height - 2) : 0;
+	int sx = x + (is_horizontal ? 0 : rand()%(width - 1));
+	int sy = y + (is_horizontal ? rand()%(height - 1) : 0);
 
 	/* door coords */
 	int dx = sx + (is_horizontal ? rand()%width : 0);
 	int dy = sy + (is_horizontal ? 0 : rand()%height);
 
-	int length = is_horizontal ? width : height;
-
 	/* draw 2 lines */
+	int length = is_horizontal ? width : height;
 	svg_line (f, sx , sy, dx-is_horizontal?1:0, dy-is_horizontal?0:1);
-	svg_line (f, dx-is_horizontal?1:0, dy-is_horizontal?0:1, sx+is_horizontal?length:0, sy+is_horizontal?0:length);
+	svg_line (f, dx + (is_horizontal?1:0), dy + (is_horizontal?0:1), sx + (is_horizontal?length:0), sy + (is_horizontal?0:length));
 
 	/* draw it on the grid*/
-	for (i = 0; i < length; ++i){
+	/*TODO important*/
+	/*for (i = 0; i < length; ++i){
 		m->grid[sx + is_horizontal?i:0][sy + is_horizontal?0:i] = 1; // [is_horizontal ? sy : sx][is_horizontal ? sy : sx]
-	}
+	}*/
 
 	//////////* recursion */
 
@@ -125,7 +123,7 @@ void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orienta
 	int w = is_horizontal ? width : (sx - x + 1);
 	int h = is_horizontal ? (sy - y + 1) : height;
 	divide(m, f, x, y, w, h, choose_orientation(w, h));
-
+	/* source point for second rectangle */
 	int x2 = is_horizontal ? x : (sx + 1);
 	int y2 = is_horizontal ? (sy + 1) : y;
 	w = is_horizontal ? width : (x + width - sx - 1);

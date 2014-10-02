@@ -20,8 +20,7 @@ void svg_footer(FILE *f) {
 void svg_line (FILE *f, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 {
   if ((x1 == x2)&&(y1==y2)) return;
-  fprintf(f, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" style=\"stroke:rgb(0,0,0);stroke-width:0.2\"/>\n",
-      x1, y1, x2, y2);
+  fprintf(f, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" style=\"stroke:rgb(0,0,0);stroke-width:0.2\"/>\n", x1, y1, x2, y2);
 }
 
 
@@ -29,7 +28,6 @@ void svg_line (FILE *f, unsigned int x1, unsigned int y1, unsigned int x2, unsig
 void svg_rect (FILE *f, unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2)
 {
   if ((x1 == x2)&&(y1==y2)) return;
-  fprintf(f, "<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" fill=\"%s\" style=\"stroke:rgb(255,255,255);stroke-width:0;\"/>\n",
-      x1, y1, x2-x1, y2-y1, svg_color);
+  fprintf(f, "<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" fill=\"%s\" style=\"stroke:rgb(255,255,255);stroke-width:0;\"/>\n", x1, y1, x2-x1, y2-y1, svg_color);
 }
 
