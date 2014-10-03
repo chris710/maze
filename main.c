@@ -1,4 +1,4 @@
-#include "main.h"
+#include "maze.h"
 
 
 int main(int argc, char **argv) {
@@ -34,27 +34,23 @@ maze *maze_random(int width, int height) {
 
 	
 	int i = 0, j = 0;		//iterators
-	//maze fields initialisation
-	maze new_maze = { height, width, (int**)malloc(sizeof(int*)*width) };
+	/* maze fields initialisation */
+	maze new_maze = { height, width, (int**)malloc(sizeof(int*)*width*2) };
 	if (new_maze.grid == NULL) {	//check if allocation succeeded
 		fprintf(stderr, "cannot allocate grid\n");
 		return NULL;
 	}
-	for (i = 0; i < width; ++i) {	//fill in the grid
-		new_maze.grid[i] = (int*)malloc(height*sizeof(int));
+	for (i = 0; i < width*2; ++i) {	//fill in the grid
+		new_maze.grid[i] = (int*)malloc(height*2*sizeof(int));
 		if (new_maze.grid[i] == NULL) {		//check if allocation succeeded
 			fprintf(stderr, "cannot allocate row\n");
 			return NULL;
 		}
-		for (j = 0; j < height; ++j)	//fill maze with emptiness
+		for (j = 0; j < height*2; ++j)	//fill maze with emptiness
 			new_maze.grid[i][j] = 0;
 	}
-	for (i = 0; i < width; ++i) 
-		for (j = 0; j < height; ++j)	
-			new_maze.grid[i][j] = 0;
 	
 	//maze *labir = initialize_maze(width,height);		//maze we're working on
-	//svg_rect (picture, 0, 0, labir->width, labir->height);
 	svg_rect(picture, 0, 0, new_maze.width, new_maze.height);
 	//create_outer_walls(picture, labir);
 	divide(&new_maze, picture, 0, 0, width, height, choose_orientation(width,height));
@@ -136,10 +132,11 @@ void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orienta
 	svg_line (f, dx + (is_horizontal?1:0), dy + (is_horizontal?0:1), sx + (is_horizontal?length:0), sy + (is_horizontal?0:length));
 
 	/* draw it on the grid*/
-	for (i = 0; i < length; ++i){
-		m->grid[sx + (is_horizontal ? i : 0)][sy + (is_horizontal ? 0 : i)] = (is_horizontal ? 1 : 2);
+	for (i = 0; i < length*2; ++i){
+		m->grid[2 * sx + (is_horizontal ? i : 0)][2 * sy + (is_horizontal ? 0 : i)] = 1;// (is_horizontal ? 1 : 2);
 	}
-	m->grid[dx][dy] = 0;
+	m->grid[2*dx][2*dy] = 0;
+	m->grid[2*dx+(is_horizontal?1:0)][2*dy+(is_horizontal?0:1)] = 0;
 
 	//////////* recursion */
 
@@ -160,9 +157,9 @@ void divide(maze *m, FILE * f, int x, int y, int width, int height, enum orienta
 
 void draw(maze *m) {
 	int i, j;
-	for (i = 0; i < m->width; ++i) {
-		for (j = 0; j < m->height; ++j) {
-			printf("%d ", m->grid[i][j]);
+	for (i = 0; i < m->width*2; ++i) {
+		for (j = 0; j < m->height*2; ++j) {
+			printf("%d ", m->grid[j][i]);
 		}
 		printf("\n");
 	}

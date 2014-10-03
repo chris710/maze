@@ -1,3 +1,14 @@
+#ifndef	MAIN_H
+#define MAIN_H
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "maze.h"
+#include "svg.h"
+
+
 typedef struct _node {
 	int id;
 	struct _node* left;		//left child
@@ -24,3 +35,4 @@ void divide(maze *m, FILE *f, int x, int y, int width, int height, enum orientat
 enum orientation choose_orientation(int width, int height);					//choose vertical or horizontal line to draw
 void draw(maze *m);															//suprisingly draws a grid in a console
  
+#endif

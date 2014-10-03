@@ -69,7 +69,6 @@
     <ClCompile Include="..\svg.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\main.h" />
     <ClInclude Include="..\maze.h" />
     <ClInclude Include="..\svg.h" />
   </ItemGroup>
